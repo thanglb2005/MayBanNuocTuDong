@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Class Diagram - Máy Bán Nước Tự Động</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 { text-align: center; color: #333; }
+        h2 { color: #444; margin-top: 36px; }
+        .diagram-container {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 16px auto;
+            max-width: 1400px;
+            overflow-x: auto;
+        }
+        .note {
+            background: #fffbe6;
+            border-left: 4px solid #f0c040;
+            padding: 12px 16px;
+            margin: 16px auto;
+            max-width: 1400px;
+            border-radius: 4px;
+            line-height: 1.7;
+            font-size: 0.92rem;
+        }
+        .note code { background: #f3f3f3; padding: 1px 5px; border-radius: 3px; font-size: 0.88rem; }
+    </style>
+</head>
+<body>
+
+<h1>Class Diagram &mdash; Hệ Thống Máy Bán Nước Tự Động</h1>
+
+<div class="note">
+    <b>Patterns:</b> Singleton (<code>VendingMachine</code>) + State (<code>VendingMachineState</code>)<br>
+    <b>Nguyên tắc:</b> Business logic only &mdash; không UI/MVC/Framework.
+    Behavior nằm trong State, VendingMachine chỉ delegate.
+</div>
+
+<!-- ============================================================ -->
+<h2>1. Class Diagram &mdash; Business Domain</h2>
+<!-- ============================================================ -->
+<div class="diagram-container">
+<pre class="mermaid">
+classDiagram
+    direction TB
+
+    %% ==================== PRODUCT HIERARCHY ====================
+    class Beverage {
+        &lt;&lt;abstract&gt;&gt;
+        -String id
+        -String name
+        -double price
+        +getId() String
+        +getName() String
+        +getPrice() double
+        +getDescription() String*
+    }
+    class Tea {
+        -String flavor
+        +getDescription() String
+    }
+    class SoftDrink {
+        -String brand
+        +getDescription() String
+    }
+    class MineralWater {
+        -double volume
+        +getDescription() String
+    }
+    Beverage <|-- Tea
+    Beverage <|-- SoftDrink
+    Beverage <|-- MineralWater
+
+    %% ==================== INVENTORY ====================
+    class InventoryItem {
+        -Beverage beverage
+        -int quantity
+        +isAvailable() boolean
+        +reduce() boolean
+        +addStock(amount) void
+    }
+    class Inventory {
+        -List~InventoryItem~ items
+        +addBeverage(beverage, qty) void
+        +findItem(id) InventoryItem
+        +reduceStock(id) boolean
+        +isAvailable(id) boolean
+        +hasAnyStock() boolean
+        +getAvailableItems() List~InventoryItem~
+    }
+
+    %% ==================== PAYMENT ====================
+    class PaymentMethod {
+        &lt;&lt;enumeration&gt;&gt;
+        COD
+        PAYOS
+        +getDisplayName() String
+    }
+
+    %% ==================== TRANSACTION ====================
+    class Transaction {
+        -Beverage beverage
+        -PaymentMethod method
+        -LocalDateTime timestamp
+        +Transaction(beverage, method)
+        +calculateAmount() double
+    }
+
+    %% ==================== STATE (interface) ====================
+    class VendingMachineState {
+        &lt;&lt;interface&gt;&gt;
+        +setContext(machine) void
+        +selectProduct(beverageId) void
+        +processPayment(method) void
+        +dispense() void
+        +getStateName() String
+    }
+
+    %% ==================== CONCRETE STATES ====================
+    class ReadyState {
+        -VendingMachine context
+        +selectProduct(beverageId) void
+    }
+    class ProcessingPaymentState {
+        -VendingMachine context
+        -Beverage selectedBeverage
+        +processPayment(method) void
+    }
+    class DispensingState {
+        -VendingMachine context
+        -Beverage selectedBeverage
+        -PaymentMethod method
+        +dispense() void
+    }
+    class OutOfStockState {
+        -VendingMachine context
+    }
+
+    VendingMachineState <|.. ReadyState
+    VendingMachineState <|.. ProcessingPaymentState
+    VendingMachineState <|.. DispensingState
+    VendingMachineState <|.. OutOfStockState
+
+    %% ==================== SINGLETON + CONTEXT ====================
+    class VendingMachine {
+        -VendingMachine instance$
+        -VendingMachineState state
+        -Inventory inventory
+        -List~Transaction~ transactions
+        -VendingMachine()
+        +getInstance()$ VendingMachine
+        +changeState(state) void
+        +selectProduct(beverageId) void
+        +processPayment(method) void
+        +dispense() void
+        +addTransaction(tx) void
+        +getInventory() Inventory
+        +getTransactions() List~Transaction~
+    }
+
+    %% ==================== RELATIONSHIPS ====================
+    VendingMachine o-- "1" VendingMachineState : state
+    VendingMachine *-- "1" Inventory : inventory
+    VendingMachine *-- "*" Transaction : transactions
+
+    Inventory *-- "*" InventoryItem : items
+    InventoryItem --> "1" Beverage : beverage
+
+    Transaction --> "1" Beverage : beverage
+    Transaction --> "1" PaymentMethod : method
+
+    ReadyState --> VendingMachine : context
+    ProcessingPaymentState --> VendingMachine : context
+    DispensingState --> VendingMachine : context
+    OutOfStockState --> VendingMachine : context
+
+    ProcessingPaymentState --> "1" Beverage : selectedBeverage
+    DispensingState --> "1" Beverage : selectedBeverage
+    DispensingState --> "1" PaymentMethod : method
+</pre>
+</div>
+
+<!-- ============================================================ -->
+<h2>2. Singleton Pattern</h2>
+<!-- ============================================================ -->
+<div class="diagram-container">
+<pre class="mermaid">
+classDiagram
+    class VendingMachine {
+        -VendingMachine instance$
+        -VendingMachine()
+        +getInstance()$ VendingMachine
+    }
+
+    note for VendingMachine "if (instance == null)\n  instance = new VendingMachine()\nreturn instance"
+</pre>
+</div>
+
+<!-- ============================================================ -->
+<h2>3. State Pattern</h2>
+<!-- ============================================================ -->
+<div class="diagram-container">
+<pre class="mermaid">
+classDiagram
+    direction LR
+
+    class VendingMachine {
+        &lt;&lt;Context&gt;&gt;
+        -VendingMachineState state
+        +changeState(state) void
+        +selectProduct(id) void
+        +processPayment(method) void
+        +dispense() void
+    }
+
+    class VendingMachineState {
+        &lt;&lt;interface&gt;&gt;
+        +setContext(machine) void
+        +selectProduct(id) void
+        +processPayment(method) void
+        +dispense() void
+        +getStateName() String
+    }
+
+    class ConcreteStates {
+        &lt;&lt;Ready | ProcessingPayment | Dispensing | OutOfStock&gt;&gt;
+        -VendingMachine context
+        +setContext(machine) void
+        +selectProduct(id) void
+        +processPayment(method) void
+        +dispense() void
+        +getStateName() String
+    }
+
+    VendingMachine o-- "1" VendingMachineState : state
+    VendingMachineState <|.. ConcreteStates
+    ConcreteStates --> VendingMachine : context
+
+    note for VendingMachine "this.state = state\nstate.setContext(this)"
+    note for ConcreteStates "// transition example\nstate = new ReadyState()\ncontext.changeState(state)"
+</pre>
+</div>
+
+<!-- ============================================================ -->
+<h2>4. State Transition Diagram</h2>
+<!-- ============================================================ -->
+<div class="diagram-container">
+<pre class="mermaid">
+stateDiagram-v2
+    [*] --> Ready
+    Ready --> ProcessingPayment : selectProduct()
+    ProcessingPayment --> Dispensing : processPayment() success
+    ProcessingPayment --> Ready : cancel / payment fail
+    Dispensing --> Ready : dispense() stock remaining
+    Dispensing --> OutOfStock : dispense() all stock depleted
+    OutOfStock --> Ready : addBeverage()
+</pre>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+</script>
+
+</body>
+</html>

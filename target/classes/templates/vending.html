@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Máy Bán Nước Tự Động</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="header-content">
+        <h1>Máy Bán Nước Tự Động</h1>
+        <p class="subtitle">Trường Đại Học &mdash; Singleton + State Pattern</p>
+        <div class="state-badge" th:classappend="${state}">
+            <span th:text="${state}">READY</span>
+        </div>
+    </div>
+</header>
+
+<!-- MESSAGES -->
+<div class="container">
+    <div class="messages" th:if="${flashMessages != null and !flashMessages.isEmpty()}">
+        <div class="message-item" th:each="msg : ${flashMessages}" th:text="${msg}"></div>
+    </div>
+
+    <!-- PAYMENT SECTION (khi đang chờ thanh toán) -->
+    <section class="payment-section" th:if="${state == 'PROCESSING_PAYMENT' and selectedBeverage != null}">
+        <h2>Thanh toán</h2>
+        <div class="selected-info">
+            <div class="selected-product">
+                <span class="label">Sản phẩm:</span>
+                <span class="value" th:text="${selectedBeverage.description}">Trà Ô Long</span>
+            </div>
+            <div class="selected-price">
+                <span class="label">Giá:</span>
+                <span class="value price" th:text="${#numbers.formatDecimal(selectedBeverage.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">15,000 VND</span>
+            </div>
+        </div>
+        <div class="payment-actions">
+            <form th:action="@{/pay}" method="post" style="display:inline">
+                <input type="hidden" name="method" value="COD">
+                <button type="submit" class="btn btn-cod">Tiền mặt (COD)</button>
+            </form>
+            <form th:action="@{/pay}" method="post" style="display:inline">
+                <input type="hidden" name="method" value="PAYOS">
+                <button type="submit" class="btn btn-payos">PayOS (Chuyển khoản)</button>
+            </form>
+            <form th:action="@{/cancel}" method="post" style="display:inline">
+                <button type="submit" class="btn btn-cancel">Hủy</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- BEVERAGES GRID -->
+    <section class="beverages-section">
+        <h2>Danh sách đồ uống</h2>
+        <div class="beverages-grid">
+            <div class="beverage-card" th:each="item : ${items}"
+                 th:classappend="${item.quantity <= 0} ? 'out-of-stock' : ''">
+
+                <div class="card-badge"
+                     th:classappend="${item.beverage.class.simpleName}"
+                     th:text="${item.beverage.class.simpleName == 'Tea' ? 'Trà'
+                             : (item.beverage.class.simpleName == 'SoftDrink' ? 'Nước ngọt' : 'Nước khoáng')}">
+                    Loại
+                </div>
+
+                <div class="card-body">
+                    <h3 th:text="${item.beverage.name}">Tên</h3>
+                    <p class="description" th:text="${item.beverage.description}">Mô tả</p>
+                    <p class="price" th:text="${#numbers.formatDecimal(item.beverage.price, 0, 'COMMA', 0, 'POINT')} + ' VND'">10,000 VND</p>
+                    <p class="stock" th:classappend="${item.quantity <= 2 and item.quantity > 0} ? 'low' : ''">
+                        Còn: <span th:text="${item.quantity}">0</span>
+                    </p>
+                </div>
+
+                <div class="card-action">
+                    <form th:action="@{/select}" method="post" th:if="${item.quantity > 0 and state == 'READY'}">
+                        <input type="hidden" name="beverageId" th:value="${item.beverage.id}">
+                        <button type="submit" class="btn btn-select">Chọn</button>
+                    </form>
+                    <span class="sold-out" th:if="${item.quantity <= 0}">Hết hàng</span>
+                    <span class="not-ready" th:if="${item.quantity > 0 and state != 'READY'}">Đang xử lý...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRANSACTION HISTORY -->
+    <section class="transactions-section" th:if="${!transactions.isEmpty()}">
+        <h2>Lịch sử giao dịch</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Sản phẩm</th>
+                        <th>Thanh toán</th>
+                        <th>Số tiền</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tx : ${transactions}">
+                        <td th:text="${tx.id}">1</td>
+                        <td th:text="${tx.beverage.description}">Trà Ô Long</td>
+                        <td th:text="${tx.paymentMethod.displayName}">COD</td>
+                        <td th:text="${tx.formattedAmount} + ' VND'">15,000 VND</td>
+                        <td th:text="${tx.formattedTime}">12:00:00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- FOOTER INFO -->
+    <footer class="footer">
+        <p>Design Patterns: <strong>Singleton</strong> (VendingMachine) + <strong>State</strong> (VendingMachineState)</p>
+        <p>Spring Boot MVC &mdash; Thymeleaf</p>
+    </footer>
+</div>
+
+</body>
+</html>

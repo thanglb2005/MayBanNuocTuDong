@@ -1,0 +1,397 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+}
+
+/* ========== HEADER ========== */
+.header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: #fff;
+    padding: 28px 0 24px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.header .subtitle {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-top: 4px;
+}
+
+.state-badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.state-badge.READY {
+    background: #16a34a;
+}
+
+.state-badge.PROCESSING_PAYMENT {
+    background: #f59e0b;
+    color: #1a1a2e;
+}
+
+.state-badge.DISPENSING {
+    background: #8b5cf6;
+}
+
+.state-badge.OUT_OF_STOCK {
+    background: #dc2626;
+}
+
+/* ========== CONTAINER ========== */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px;
+}
+
+/* ========== MESSAGES ========== */
+.messages {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+}
+
+.message-item {
+    padding: 4px 0;
+    font-size: 0.9rem;
+    color: #1e40af;
+}
+
+.message-item::before {
+    content: "\25B6  ";
+    font-size: 0.7rem;
+}
+
+/* ========== PAYMENT SECTION ========== */
+.payment-section {
+    background: #fff;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.payment-section h2 {
+    color: #b45309;
+    margin-bottom: 16px;
+    font-size: 1.3rem;
+}
+
+.selected-info {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.selected-info .label {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.selected-info .value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.selected-info .value.price {
+    color: #dc2626;
+    font-size: 1.3rem;
+}
+
+.payment-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-select {
+    background: #2563eb;
+    color: #fff;
+    width: 100%;
+}
+
+.btn-select:hover {
+    background: #1d4ed8;
+}
+
+.btn-cod {
+    background: #16a34a;
+    color: #fff;
+}
+
+.btn-cod:hover {
+    background: #15803d;
+}
+
+.btn-payos {
+    background: #7c3aed;
+    color: #fff;
+}
+
+.btn-payos:hover {
+    background: #6d28d9;
+}
+
+.btn-cancel {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-cancel:hover {
+    background: #d1d5db;
+}
+
+/* ========== BEVERAGES GRID ========== */
+.beverages-section {
+    margin-bottom: 28px;
+}
+
+.beverages-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    color: #1e3a5f;
+}
+
+.beverages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.beverage-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.beverage-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.beverage-card.out-of-stock {
+    opacity: 0.55;
+}
+
+.card-badge {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+.card-badge.Tea {
+    background: #16a34a;
+}
+
+.card-badge.SoftDrink {
+    background: #dc2626;
+}
+
+.card-badge.MineralWater {
+    background: #0891b2;
+}
+
+.card-body {
+    padding: 16px;
+    flex: 1;
+}
+
+.card-body h3 {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+}
+
+.card-body .description {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.card-body .price {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.card-body .stock {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+.card-body .stock.low {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.card-action {
+    padding: 12px 16px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.sold-out {
+    display: block;
+    text-align: center;
+    color: #dc2626;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.not-ready {
+    display: block;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+
+/* ========== TRANSACTIONS TABLE ========== */
+.transactions-section {
+    margin-bottom: 28px;
+}
+
+.transactions-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    color: #1e3a5f;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    background: #f8fafc;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+tbody td {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+.status-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.status-badge.success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status-badge.failed {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* ========== FOOTER ========== */
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #9ca3af;
+    font-size: 0.82rem;
+}
+
+.footer strong {
+    color: #6b7280;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 600px) {
+    .header h1 {
+        font-size: 1.3rem;
+    }
+
+    .beverages-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+    }
+
+    .payment-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .payment-actions form {
+        display: block !important;
+    }
+
+    .payment-actions .btn {
+        width: 100%;
+    }
+}
